@@ -23,11 +23,12 @@ const editProfileButton = profile.querySelector('.profile__edit-button');
 const popupTypeEdit = document.querySelector('.popup_type_edit');
 const editPopupCloseButton = popupTypeEdit.querySelector('.popup__close');
 const userName = popupTypeEdit.querySelector('.popup__input_type_name');
-userName.value = profileTitle.textContent;
 const userDescr = popupTypeEdit.querySelector('.popup__input_type_description');
-userDescr.value = profileDescr.textContent;
 const popupEditForm = popupTypeEdit.querySelector('.popup__form');
-editProfileButton.addEventListener('click', () => {openModal(popupTypeEdit)});
+editProfileButton.addEventListener('click', () => {
+  userName.value = profileTitle.textContent;
+  userDescr.value = profileDescr.textContent;
+  openModal(popupTypeEdit)});
 editPopupCloseButton.addEventListener('click', () => {closeModal(popupTypeEdit)});
 
 popupEditForm.addEventListener('submit', handleSubmitEditPopupBtn);

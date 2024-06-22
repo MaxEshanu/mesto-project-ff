@@ -1,9 +1,9 @@
 //Импорты
 
 import './pages/index.css';
-import {initialCards} from './scripts/cards.js';
-import {createCard, deleteCard, cardLike} from './scripts/card.js';
+import {createCard, deleteCard, cardLike, showCards} from './scripts/card.js';
 import {openModal, closeModal} from './scripts/modal.js';
+import {enableValidation} from './scripts/validation.js';
 
 // @todo: Темплейт карточки
 
@@ -18,6 +18,7 @@ const cardsContainer = container.querySelector('.places__list');
 
 const profile = document.querySelector('.profile');
 const profileTitle = profile.querySelector('.profile__title');
+const profileImg = profile.querySelector('.profile__image');
 const profileDescr = profile.querySelector('.profile__description');
 const editProfileButton = profile.querySelector('.profile__edit-button');
 const popupTypeEdit = document.querySelector('.popup_type_edit');
@@ -30,7 +31,6 @@ editProfileButton.addEventListener('click', () => {
   userDescr.value = profileDescr.textContent;
   openModal(popupTypeEdit)});
 editPopupCloseButton.addEventListener('click', () => {closeModal(popupTypeEdit)});
-
 popupEditForm.addEventListener('submit', handleSubmitEditPopupBtn);
 function handleSubmitEditPopupBtn(event) {
   event.preventDefault();
@@ -53,24 +53,9 @@ popupNewCardCloseBtn.addEventListener('click', () => {closeModal(popupNewCard)})
 const cardName = popupNewCard.querySelector('.popup__input_type_card-name');
 const cardLink = popupNewCard.querySelector('.popup__input_type_url');
 const popupNewCardForm = popupNewCard.querySelector('.popup__form');
-popupNewCardForm.addEventListener('submit', () => {addNewCard(event)});
+popupNewCardForm.addEventListener('submit', () => {myNewCard()});
 
-function addNewCard (event) {
-  event.preventDefault()
-  const cardObject = {
-    name: cardName.value,
-    link: cardLink.value,
-  };
-  const cardElement = createCard(cardTemplate, cardObject, deleteCard, openModalCard, cardLike);
-  cardsContainer.prepend(cardElement);
-  closeModal(popupNewCard);
-  popupNewCardForm.reset();
-};
 
-initialCards.forEach((cardData) => {
-  const cardElement = createCard(cardTemplate, cardData, deleteCard, openModalCard, cardLike);
-  cardsContainer.append(cardElement);
-});
 
 //Открытие попапа карточки
 
@@ -86,4 +71,106 @@ function openModalCard (cardData) {
   cardPopupCaption.textContent = cardData.name;
   openModal(cardPopup);
 };
+
+//Валидация
+
+enableValidation();
+
+//Запросы к серверу
+
+function getUser() {
+  fetch('https://nomoreparties.co/v1/wff-cohort-16/users/me', {
+    method: 'GET',
+    headers: {
+      authorization: 'cdadadbe-9b78-499d-b557-fa10b7ab1ab1'
+    }
+  })
+    .then(res => {return res.json()})
+    .then(data => {
+      profileTitle.textContent = data.name
+      profileDescr.textContent = data.about
+      profileImg.style = `background-image: url(${data.avatar})`
+    })
+    .catch((err) => {
+      console.log('Ошибка. Запрос не выполнен: ', err)});
+}
+
+function getCards() {
+  fetch('https://nomoreparties.co/v1/wff-cohort-16/cards', {
+    method: 'GET',
+    headers: {
+      authorization: 'cdadadbe-9b78-499d-b557-fa10b7ab1ab1'
+    }
+  })
+    .then(res => {return res.json()})
+    .then(data => data.forEach((data) => {
+      const cardElement = showCards(cardTemplate, data, openModalCard, cardLike);
+      cardsContainer.append(cardElement);
+    }))
+    .catch((err) => {
+      console.log('Ошибка. Запрос не выполнен: ', err)});
+    
+}
+
+function updateUser () {fetch('https://nomoreparties.co/v1/wff-cohort-16/users/me', {
+  method: 'PATCH',
+  headers: {
+    authorization: 'cdadadbe-9b78-499d-b557-fa10b7ab1ab1',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    name: profileTitle.textContent,
+    about: profileDescr.textContent
+  })
+
+})
+}
+
+function myNewCard () {
+  fetch('https://nomoreparties.co/v1/wff-cohort-16/cards', {
+  method: 'POST',
+  headers: {
+    authorization: 'cdadadbe-9b78-499d-b557-fa10b7ab1ab1',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    name: cardName.value,
+    link: cardLink.value
+  })
+  
+  
+})
+.then(res => {return res.json()})
+.then(data => {
+  const cardObject = {
+    name: data.name,
+    link: data.link,
+  };
+  const cardElement = createCard(cardTemplate, cardObject, deleteCard, openModalCard, cardLike);
+  cardsContainer.append(cardElement);
+})
+}
+
+function likee () {
+  fetch('https://nomoreparties.co/v1/wff-cohort-16/cards', {
+    method: 'GET',
+    headers: {
+      authorization: 'cdadadbe-9b78-499d-b557-fa10b7ab1ab1'
+    }
+  })
+    .then(res => {return res.json()})
+    .then(data => {
+      const likeCounter = data.likes
+      console.log(likeCounter)
+    })
+    .catch((err) => {
+      console.log('Ошибка. Запрос не выполнен: ', err)});
+}
+
+getCards();
+popupEditForm.addEventListener('submit', () => {updateUser(), getUser()});
+
+
+
+
 

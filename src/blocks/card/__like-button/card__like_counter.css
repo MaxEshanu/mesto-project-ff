@@ -1,0 +1,7 @@
+@import url('../__like-button/card__like_counter-number.css');
+
+.card__like_counter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

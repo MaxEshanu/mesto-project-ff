@@ -1,3 +1,5 @@
+@import url('../__delete-button/visually__hidden.css');
+
 .card__delete-button {
   width: 18px;
   height: 18px;

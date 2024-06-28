@@ -1,5 +1,4 @@
 export function openModal (popup) {
-  popup.classList.add('popup_is-animated');
   popup.classList.add('popup_is-opened');
   popup.addEventListener('click', closeOverlay);
   document.addEventListener('keydown', (e) => {closeModalByEsc(e, popup)});
@@ -22,4 +21,6 @@ function closeOverlay (popup) {
     closeModal(popup.currentTarget);
   } 
 };
+
+
 

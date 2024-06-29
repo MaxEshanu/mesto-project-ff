@@ -19,8 +19,8 @@ export function createCard(
   cardImage.alt = cardData.name;
   if (userId === cardData.owner._id) {
     deleteButton.addEventListener("click", () => {
-      deleteCardRequest(cardData._id);
-      deleteCard(cardElement);
+      deleteCardRequest(cardData._id)
+      .then(deleteCard(cardElement))
     });
   } else {
     deleteButton.remove();

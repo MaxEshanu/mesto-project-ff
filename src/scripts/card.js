@@ -21,6 +21,7 @@ export function createCard(
     deleteButton.addEventListener("click", () => {
       deleteCardRequest(cardData._id)
       .then(deleteCard(cardElement))
+      .catch((err) => {console.log(err)})
     });
   } else {
     deleteButton.remove();
